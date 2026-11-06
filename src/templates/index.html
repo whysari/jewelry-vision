@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en" class="h-100">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Jewelry & Accessory Description Generator">
+    <title>Jewelry Vision - Smart Accessory Descriptor</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 12px 40px rgba(0, 0, 0, 0.15);
+            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container-fluid {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: var(--shadow-strong);
+            padding: 3rem;
+            width: 100%;
+            max-width: 600px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .app-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .upload-section {
+            margin-bottom: 2rem;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--glass-border);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-upload-area:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .file-upload-area.dragover {
+            border-color: #4facfe;
+            background: rgba(79, 172, 254, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover .upload-icon {
+            color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.1);
+        }
+
+        .upload-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-hint {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .image-preview {
+            margin-top: 1rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            display: none;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .level-selector {
+            margin-bottom: 2rem;
+        }
+
+        .level-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: block;
+            font-size: 1.1rem;
+        }
+
+        .level-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .level-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .level-option:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .level-option.selected {
+            background: rgba(79, 172, 254, 0.2);
+            border-color: #4facfe;
+            color: white;
+        }
+
+        .level-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-description {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .submit-btn {
+            background: var(--success-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: var(--shadow-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin-right: 0.5rem;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+            text-align: center;
+        }
+
+        .result-image-container {
+            margin-bottom: 2rem;
+        }
+
+        .result-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-medium);
+            object-fit: contain;
+        }
+
+        .result-caption {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-caption h3 {
+            color: white;
+            font-weight: 500;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .back-btn {
+            background: var(--dark-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-card {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+                border-radius: 20px;
+            }
+
+            .app-title {
+                font-size: 2rem;
+            }
+
+            .file-upload-area {
+                padding: 2rem 1rem;
+                min-height: 150px;
+            }
+
+            .upload-icon {
+                font-size: 2rem;
+            }
+
+            .level-options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .fade-transition {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .fade-out {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="main-card animate-in">
+            <!-- Main Upload Section -->
+            <div id="main_block" class="upload-section fade-transition fade-in">
+                <div class="header-section">
+                    <h1 class="app-title">
+                        <i class="fas fa-gem"></i>
+                        Jewelry Vision
+                    </h1>
+                    <p class="app-subtitle">
+                        Upload your jewelry or accessory image and get intelligent description
+                    </p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" id="form">
+                    <div class="file-upload-wrapper">
+                        <div class="file-upload-area" onclick="document.getElementById('customFile').click()">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <div class="upload-text">Click to upload or drag & drop</div>
+                            <div class="upload-hint">Supports JPG, JPEG, PNG formats</div>
+                        </div>
+                        <input name="file" type="file" class="file-input" id="customFile" accept=".jpg,.jpeg,.png">
+                        <div class="image-preview" id="image-preview">
+                            <img id="preview-img" src="" alt="Preview">
+                        </div>
+                    </div>
+
+                    <div class="level-selector">
+                        <label class="level-label">
+                            <i class="fas fa-layer-group"></i>
+                            Choose Description Level
+                        </label>
+                        <div class="level-options">
+                            <div class="level-option" data-value="1">
+                                <div class="level-title">Simple</div>
+                                <div class="level-description">Basic identification</div>
+                            </div>
+                            <div class="level-option" data-value="2">
+                                <div class="level-title">Medium</div>
+                                <div class="level-description">Detailed features</div>
+                            </div>
+                            <div class="level-option" data-value="3">
+                                <div class="level-title">Complete</div>
+                                <div class="level-description">Comprehensive Description</div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="level" id="selectedLevel" value="">
+                    </div>
+
+                    <button type="button" class="submit-btn" id="uploadButton">
+                        <i class="fas fa-spinner fa-spin loading-spinner"></i>
+                        <i class="fas fa-magic"></i>
+                        Generate Description
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div id="result_block" class="results-section fade-transition">
+                <div class="header-section">
+                    <h1 class="app-title">
+                        <i class="fas fa-sparkles"></i>
+                        Description Complete
+                    </h1>
+                </div>
+
+                <div class="result-image-container">
+                    <img id="result_image" class="result-image" src="" alt="Descripted jewelry">
+                </div>
+
+                <div class="result-caption">
+                    <div id="result_caption"></div>
+                </div>
+
+                <button type="button" class="back-btn" id="goBack">
+                    <i class="fas fa-arrow-left"></i>
+                    Descript Another Image
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            let selectedLevel = '';
+            
+            // File upload handling
+            $('#customFile').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#preview-img').attr('src', e.target.result);
+                        $('#image-preview').fadeIn();
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    $('.file-upload-area').addClass('file-selected');
+                    $('.upload-text').text(file.name);
+                    $('.upload-hint').text('File selected successfully');
+                }
+            });
+
+            // Drag and drop functionality
+            $('.file-upload-area').on('dragover', function(e) {
+                e.preventDefault();
+                $(this).addClass('dragover');
+            });
+
+            $('.file-upload-area').on('dragleave', function(e) {
+                e.preventDefault();
+                $(this).removeClass('dragover');
+            });
+
+            $('.file-upload-area').on('drop', function(e) {
+                e.preventDefault();
+                $(this).removeClass('dragover');
+                
+                const files = e.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    $('#customFile')[0].files = files;
+                    $('#customFile').trigger('change');
+                }
+            });
+
+            // Level selection
+            $('.level-option').click(function() {
+                $('.level-option').removeClass('selected');
+                $(this).addClass('selected');
+                selectedLevel = $(this).data('value');
+                $('#selectedLevel').val(selectedLevel);
+            });
+
+            // Upload button click
+            $('#uploadButton').click(function () {
+                const fileInput = $('#customFile');
+                const fileName = fileInput.val();
+                
+                if (!fileName) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No Image Selected',
+                        text: 'Please select an image to descript.',
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            popup: 'swal-custom'
+                        }
+                    });
+                    return;
+                }
+
+                const validExtensions = ['jpg', 'jpeg', 'png'];
+                const fileExtension = fileName.split('.').pop().toLowerCase();
+                
+                if (!validExtensions.includes(fileExtension)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid Format',
+                        text: 'Please select a supported image format (JPG, JPEG, PNG).',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                if (!selectedLevel) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Select Description Level',
+                        text: 'Please choose a description level before proceeding.',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                // Show loading state
+                const button = $(this);
+                button.prop('disabled', true);
+                $('.loading-spinner').show();
+                button.find('.fa-magic').hide();
+
+                // Fade out main block
+                $('#main_block').addClass('fade-out');
+                
+                setTimeout(() => {
+                    const formData = new FormData($('#form')[0]);
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/predict",
+                        data: formData,
+                        contentType: false,
+                        cache: false,
+                        processData: false,
+                        success: function (data) {
+                            const imagePath = "../static/" + data.image_path;
+                            const caption = data.caption;
+
+                            $('#result_image').attr('src', imagePath);
+                            $('#result_caption').html("<h3>" + caption + "</h3>");
+
+                            // Show result block
+                            $('#main_block').hide();
+                            $('#result_block').show().removeClass('fade-out').addClass('fade-in');
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Description Failed',
+                                text: 'Something went wrong during description. Please try again.',
+                                confirmButtonText: 'OK'
+                            });
+                            
+                            // Reset UI
+                            $('#main_block').removeClass('fade-out').addClass('fade-in');
+                            button.prop('disabled', false);
+                            $('.loading-spinner').hide();
+                            button.find('.fa-magic').show();
+                        }
+                    });
+                }, 500);
+            });
+
+            // Go back button
+            $('#goBack').click(function () {
+                $('#result_block').addClass('fade-out');
+                
+                setTimeout(() => {
+                    $('#result_block').hide();
+                    $('#main_block').show().removeClass('fade-out').addClass('fade-in');
+                    
+                    // Reset form
+                    $('#uploadButton').prop('disabled', false);
+                    $('.loading-spinner').hide();
+                    $('#uploadButton').find('.fa-magic').show();
+                    $('#customFile').val('');
+                    $('#image-preview').hide();
+                    $('.level-option').removeClass('selected');
+                    $('#selectedLevel').val('');
+                    $('.file-upload-area').removeClass('file-selected');
+                    $('.upload-text').text('Click to upload or drag & drop');
+                    $('.upload-hint').text('Supports JPG, JPEG, PNG formats');
+                    selectedLevel = '';
+                }, 300);
+            });
+        });
+    </script>
+</body>
+
+</html>

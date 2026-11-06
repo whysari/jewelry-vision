@@ -1,0 +1,28 @@
+START = "startcap"
+STOP = "endcap"
+EMBEDDING_SIZE = 300
+EMBEDDING_NAME = "cc.mn.300.vec"
+
+"""VALUES FOR INCEPTION MODEL"""
+INCEPTION_WIDTH = 299
+INCEPTION_HEIGHT = 299
+INCEPTION_OUTPUT_DIM = 2048
+"""--------------------------"""
+
+"""VALUES FOR VGG16 MODEL"""
+VGG16_WIDTH = 224
+VGG16_HEIGHT = 224
+VGG16_OUTPUT_DIM = 4096
+"""--------------------------"""
+
+"""VALUES FOR MOBILENET MODEL"""
+MOBILENET_WIDTH = 224
+MOBILENET_HEIGHT = 224
+MOBILENET_OUTPUT_DIM = 50176
+"""--------------------------"""
+
+"""VALUES FOR RNN MODEL"""
+LOSS = "categorical_crossentropy"
+LEARNING_RATE = 1e-3
+OPTIMIZER = "adam"
+METRICS = ["accuracy"]

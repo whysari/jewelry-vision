@@ -1,0 +1,24 @@
+# Core Deep Learning Framework
+tensorflow>=2.15.0
+keras>=3.0.0
+
+# Interactive Web Demos & Serving
+gradio>=4.0.0
+streamlit>=1.30.0
+flask>=3.0.0
+werkzeug>=3.0.0
+
+# Computer Vision & Numerical Processing
+numpy>=1.24.0,<2.2.0
+pillow>=10.0.0
+
+# Machine Learning & Metrics
+scikit-learn>=1.3.0
+pandas>=2.0.0
+
+# Visualization & Evaluation
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Optional Multi-Lingual Translation
+googletrans==4.0.0rc1
